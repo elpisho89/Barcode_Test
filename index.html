@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Consulta de Equipos</title>
+
+<style>
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background: linear-gradient(135deg, #eef2ff, #f8fafc);
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 420px;
+        margin: 40px auto;
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    h2 {
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .search-box {
+        margin: 15px 0;
+    }
+
+    input {
+        padding: 10px;
+        width: 65%;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        outline: none;
+    }
+
+    button {
+        padding: 10px 15px;
+        border: none;
+        background: #4f46e5;
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    button:hover {
+        background: #3730a3;
+    }
+
+    .folio {
+        margin: 20px 0;
+        font-size: 18px;
+        font-weight: bold;
+        color: #4f46e5;
+        background: #eef2ff;
+        padding: 8px;
+        border-radius: 8px;
+    }
+
+    .gallery {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .item {
+        background: #f9fafb;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+    }
+
+    .item-title {
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 10px;
+    }
+
+    img {
+        width: 100%;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Consulta por Folio</h2>
+
+    <div class="search-box">
+        <input type="text" id="inputFolio" placeholder="Ej: WOT0999918">
+        <button onclick="buscar()">Buscar</button>
+    </div>
+
+    <div class="folio" id="folio">—</div>
+
+    <div class="gallery">
+        <div class="item">
+            <div class="item-title">CPU</div>
+            <img id="cpu">
+        </div>
+
+        <div class="item">
+            <div class="item-title">Monitor</div>
+            <img id="monitor">
+        </div>
+
+        <div class="item">
+            <div class="item-title">UPS</div>
+            <img id="ups">
+        </div>
+    </div>
+</div>
+
+<script>
+let baseDatos = [];
+
+// 🔹 Cargar CSV
+fetch("data.csv")
+  .then(res => res.text())
+  .then(text => {
+      const filas = text.split("\n").slice(1);
+
+      baseDatos = filas.map(f => {
+          const [folio, cpu, monitor, ups] = f.split(",");
+          return { folio, cpu, monitor, ups };
+      });
+  });
+
+// 🔹 Generar barcode
+function generarBarcode(valor) {
+    return `https://barcodeapi.org/api/code128/${valor}`;
+}
+
+// 🔹 Buscar
+function buscar() {
+    const folioInput = document.getElementById("inputFolio").value.trim();
+
+    const item = baseDatos.find(x => x.folio === folioInput);
+
+    if (!item) {
+        alert("Folio no encontrado");
+        return;
+    }
+
+    document.getElementById("folio").innerText = "Folio: " + item.folio;
+    document.getElementById("cpu").src = generarBarcode(item.cpu);
+    document.getElementById("monitor").src = generarBarcode(item.monitor);
+    document.getElementById("ups").src = generarBarcode(item.ups);
+}
+</script>
+
+</body>
+</html>
