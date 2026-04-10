@@ -8,8 +8,6 @@
     body {
         font-family: 'Segoe UI', sans-serif;
         background: linear-gradient(135deg, #eef2ff, #f8fafc);
-        margin: 0;
-        padding: 0;
     }
 
     .container {
@@ -22,35 +20,12 @@
         text-align: center;
     }
 
-    h2 {
-        margin-bottom: 10px;
-        color: #333;
-    }
-
-    .search-box {
-        margin: 15px 0;
-    }
-
     input {
         padding: 10px;
-        width: 65%;
+        width: 80%;
         border: 1px solid #ccc;
         border-radius: 8px;
         outline: none;
-    }
-
-    button {
-        padding: 10px 15px;
-        border: none;
-        background: #4f46e5;
-        color: white;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: 0.3s;
-    }
-
-    button:hover {
-        background: #3730a3;
     }
 
     .folio {
@@ -73,7 +48,6 @@
         background: #f9fafb;
         padding: 15px;
         border-radius: 10px;
-        box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
     }
 
     .item-title {
@@ -85,6 +59,12 @@
     img {
         width: 100%;
     }
+
+    .status {
+        font-size: 12px;
+        color: #999;
+        margin-top: 10px;
+    }
 </style>
 </head>
 
@@ -93,10 +73,7 @@
 <div class="container">
     <h2>Consulta por Folio</h2>
 
-    <div class="search-box">
-        <input type="text" id="inputFolio" placeholder="Ej: WOT0999918">
-        <button onclick="buscar()">Buscar</button>
-    </div>
+    <input type="text" id="inputFolio" placeholder="Escribe el folio...">
 
     <div class="folio" id="folio">—</div>
 
@@ -116,10 +93,13 @@
             <img id="ups">
         </div>
     </div>
+
+    <div class="status" id="status"></div>
 </div>
 
 <script>
 let baseDatos = [];
+let timeout = null;
 
 // 🔹 Cargar CSV
 fetch("data.csv")
@@ -131,21 +111,24 @@ fetch("data.csv")
           const [folio, cpu, monitor, ups] = f.split(",");
           return { folio, cpu, monitor, ups };
       });
+
+      document.getElementById("status").innerText = "Base cargada ✔";
   });
 
-// 🔹 Generar barcode
+// 🔹 Barcode
 function generarBarcode(valor) {
     return `https://barcodeapi.org/api/code128/${valor}`;
 }
 
 // 🔹 Buscar
-function buscar() {
-    const folioInput = document.getElementById("inputFolio").value.trim();
-
+function buscar(folioInput) {
     const item = baseDatos.find(x => x.folio === folioInput);
 
     if (!item) {
-        alert("Folio no encontrado");
+        document.getElementById("folio").innerText = "No encontrado";
+        document.getElementById("cpu").src = "";
+        document.getElementById("monitor").src = "";
+        document.getElementById("ups").src = "";
         return;
     }
 
@@ -154,6 +137,19 @@ function buscar() {
     document.getElementById("monitor").src = generarBarcode(item.monitor);
     document.getElementById("ups").src = generarBarcode(item.ups);
 }
+
+// 🔹 Evento en tiempo real (con debounce)
+document.getElementById("inputFolio").addEventListener("input", function(e) {
+    const valor = e.target.value.trim();
+
+    clearTimeout(timeout);
+
+    timeout = setTimeout(() => {
+        if (valor.length > 2) { // evita buscar con 1 letra
+            buscar(valor);
+        }
+    }, 300); // 300ms = más fluido
+});
 </script>
 
 </body>
