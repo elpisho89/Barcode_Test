@@ -6,117 +6,164 @@
 
 <title>Implementaciones - Barcodes</title>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+
 <style>
 body {
   margin: 0;
+  padding: 0;
+  overflow: hidden;
   font-family: Arial, sans-serif;
-  text-align: center;
 }
 
-/* Fondo */
+/* Fondo SIEMPRE completo */
 #background-lottie {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 110, 200, 0.65);
+  width: 100vw;
+  height: 100vh;
   z-index: 0;
 }
 
 /* Contenedor principal */
 .central-container {
-  background: rgba(255, 255, 255, 0.85);
-  border-radius: 40px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-  width: 420px;
-  margin: 60px auto;
-  padding: 25px;
   position: relative;
   z-index: 2;
+  width: 50vw;
+  height: 90vh;
+  margin: auto;
+  margin-top: 3vh;
+  background: rgba(255,255,255,0.8);
+  border-radius: 40px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.5s ease;
+}
+
+/* 🔥 MODO EXPANDIDO */
+.central-container.expandido {
+  width: 80vw;
+  display: flex;
+  flex-direction: row;
+}
+
+/* IZQUIERDA */
+.left-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* DERECHA */
+.right-panel {
+  flex: 1;
+  display: none;
+  padding: 20px;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Mostrar resultados */
+.central-container.expandido .right-panel {
+  display: flex;
 }
 
 /* Bot */
 #lottie-bot {
-  width: 150px;
-  margin: auto;
+  width: 180px;
 }
 
 /* Input */
 .search-container input {
+  margin-top: 15px;
   padding: 10px;
-  width: 70%;
   border-radius: 10px;
   border: 1px solid #ccc;
+  width: 70%;
 }
 
-/* Resultado */
-#resultado {
-  margin-top: 15px;
-  display: none;
-}
-
-#folioLabel {
-  font-weight: bold;
-  color: #0078d4;
-  margin-bottom: 10px;
-}
-
+/* Cards */
 .card {
-  background: #f5f5f5;
+  background: white;
   padding: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   border-radius: 10px;
+  text-align: center;
 }
 
 .card img {
   width: 200px;
 }
-</style>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+/* Logos */
+#logo-mbt {
+  position: absolute;
+  top: 10px;
+  left: 20px;
+  width: 120px;
+}
+
+#logo-ds {
+  position: absolute;
+  bottom: 10px;
+  right: 20px;
+  width: 80px;
+}
+</style>
 </head>
 
 <body>
 
-<!-- 🎥 Fondo -->
 <div id="background-lottie"></div>
 
-<div class="central-container">
+<div class="central-container" id="mainContainer">
 
-  <h2>Implementaciones Mainbit</h2>
+  <!-- IZQUIERDA -->
+  <div class="left-panel">
 
-  <!-- 🤖 BOT -->
-  <div id="lottie-bot"></div>
+    <h2>Implementaciones Mainbit</h2>
 
-  <!-- 🔍 INPUT -->
-  <div class="search-container">
-    <input type="text" id="folioInput" placeholder="Escribe el folio a consultar ...">
+    <div id="lottie-bot"></div>
+
+    <div class="search-container">
+      <input type="text" id="folioInput" placeholder="Escribe el folio a consultar ...">
+    </div>
+
   </div>
 
-  <!-- 📦 RESULTADOS -->
-  <div id="resultado">
+  <!-- DERECHA -->
+  <div class="right-panel" id="resultado">
 
-    <div id="folioLabel"></div>
+    <div>
+      <div id="folioLabel" style="font-weight:bold;color:#0078d4;margin-bottom:10px;"></div>
 
-    <div class="card">
-      <div>CPU</div>
-      <img id="cpu">
-    </div>
+      <div class="card">
+        <div>CPU</div>
+        <img id="cpu">
+      </div>
 
-    <div class="card">
-      <div>Monitor</div>
-      <img id="monitor">
-    </div>
+      <div class="card">
+        <div>Monitor</div>
+        <img id="monitor">
+      </div>
 
-    <div class="card">
-      <div>UPS</div>
-      <img id="ups">
+      <div class="card">
+        <div>UPS</div>
+        <img id="ups">
+      </div>
     </div>
 
   </div>
 
 </div>
+
+<!-- Logos -->
+<div id="logo-mbt"></div>
+<div id="logo-ds"></div>
 
 <script>
 // 🎥 LOTTIE
@@ -136,6 +183,22 @@ lottie.loadAnimation({
   autoplay: true
 });
 
+lottie.loadAnimation({
+  container: document.getElementById("logo-mbt"),
+  path: "./Logo_Mbt_wink.json",
+  renderer: "svg",
+  loop: true,
+  autoplay: true
+});
+
+lottie.loadAnimation({
+  container: document.getElementById("logo-ds"),
+  path: "./Logo_DS_wink.json",
+  renderer: "svg",
+  loop: true,
+  autoplay: true
+});
+
 // 📊 DATA
 let baseDatos = [];
 let timeout = null;
@@ -144,7 +207,6 @@ fetch("data.csv")
   .then(res => res.text())
   .then(text => {
     const filas = text.split("\n").slice(1);
-
     baseDatos = filas.map(f => {
       const [folio, cpu, monitor, ups] = f.split(",");
       return { folio, cpu, monitor, ups };
@@ -160,12 +222,10 @@ function generarBarcode(valor) {
 function buscar(folioInput) {
   const item = baseDatos.find(x => x.folio === folioInput);
 
-  if (!item) {
-    document.getElementById("resultado").style.display = "none";
-    return;
-  }
+  if (!item) return;
 
-  document.getElementById("resultado").style.display = "block";
+  document.getElementById("mainContainer").classList.add("expandido");
+
   document.getElementById("folioLabel").innerText = "Folio: " + item.folio;
 
   document.getElementById("cpu").src = generarBarcode(item.cpu);
@@ -173,7 +233,7 @@ function buscar(folioInput) {
   document.getElementById("ups").src = generarBarcode(item.ups);
 }
 
-// 🔹 Tiempo real
+// ⌨️ Tiempo real
 document.getElementById("folioInput").addEventListener("input", function(e) {
   const valor = e.target.value.trim();
 
@@ -182,8 +242,6 @@ document.getElementById("folioInput").addEventListener("input", function(e) {
   timeout = setTimeout(() => {
     if (valor.length > 2) {
       buscar(valor);
-    } else {
-      document.getElementById("resultado").style.display = "none";
     }
   }, 300);
 });
