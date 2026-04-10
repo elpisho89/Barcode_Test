@@ -2,153 +2,216 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Consulta de Equipos</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Implementaciones - Barcodes</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
 
 <style>
-    body {
-        font-family: 'Segoe UI', sans-serif;
-        background: linear-gradient(135deg, #eef2ff, #f8fafc);
-    }
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
 
-    .container {
-        max-width: 420px;
-        margin: 40px auto;
-        background: white;
-        padding: 25px;
-        border-radius: 15px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        text-align: center;
-    }
+/* 🎥 FONDO LOTTIE */
+#background-lottie {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
 
-    input {
-        padding: 10px;
-        width: 80%;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        outline: none;
-    }
+/* CONTENEDOR */
+.container {
+  position: relative;
+  z-index: 2;
+  width: 420px;
+  margin: 40px auto;
+  padding: 25px;
+  border-radius: 25px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(15px);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  text-align: center;
+  color: white;
+}
 
-    .folio {
-        margin: 20px 0;
-        font-size: 18px;
-        font-weight: bold;
-        color: #4f46e5;
-        background: #eef2ff;
-        padding: 8px;
-        border-radius: 8px;
-    }
+/* BOT */
+#lottie-bot {
+  width: 150px;
+  margin: auto;
+}
 
-    .gallery {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
+/* INPUT */
+.search-container input {
+  width: 70%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+}
 
-    .item {
-        background: #f9fafb;
-        padding: 15px;
-        border-radius: 10px;
-    }
+/* RESULTADO */
+.resultado {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.15);
+  animation: fadeSlide 0.4s ease;
+}
 
-    .item-title {
-        font-size: 14px;
-        color: #555;
-        margin-bottom: 10px;
-    }
+.oculto {
+  display: none;
+}
 
-    img {
-        width: 100%;
-    }
+.folio-label {
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #60a5fa;
+}
 
-    .status {
-        font-size: 12px;
-        color: #999;
-        margin-top: 10px;
-    }
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.card {
+  background: white;
+  color: black;
+  padding: 12px;
+  border-radius: 15px;
+}
+
+.card img {
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* Animación */
+@keyframes fadeSlide {
+  from {opacity:0; transform: translateY(10px);}
+  to {opacity:1; transform: translateY(0);}
+}
 </style>
 </head>
 
 <body>
 
+<!-- 🎥 Fondo -->
+<div id="background-lottie"></div>
+
 <div class="container">
-    <h2>Consulta por Folio</h2>
 
-    <input type="text" id="inputFolio" placeholder="Escribe el folio...">
+  <h2>Implementaciones Mainbit</h2>
 
-    <div class="folio" id="folio">—</div>
+  <!-- 🤖 BOT -->
+  <div id="lottie-bot"></div>
 
-    <div class="gallery">
-        <div class="item">
-            <div class="item-title">CPU</div>
-            <img id="cpu">
-        </div>
+  <!-- 🔍 INPUT -->
+  <div class="search-container">
+    <input type="text" id="folioInput" placeholder="Escribe el folio a consultar ...">
+  </div>
 
-        <div class="item">
-            <div class="item-title">Monitor</div>
-            <img id="monitor">
-        </div>
+  <!-- 📦 RESULTADOS -->
+  <div id="resultado" class="resultado oculto">
 
-        <div class="item">
-            <div class="item-title">UPS</div>
-            <img id="ups">
-        </div>
+    <div class="folio-label" id="folioLabel"></div>
+
+    <div class="cards">
+
+      <div class="card">
+        <div>CPU</div>
+        <img id="cpu">
+      </div>
+
+      <div class="card">
+        <div>Monitor</div>
+        <img id="monitor">
+      </div>
+
+      <div class="card">
+        <div>UPS</div>
+        <img id="ups">
+      </div>
+
     </div>
 
-    <div class="status" id="status"></div>
+  </div>
+
 </div>
 
 <script>
+// 🎥 LOTTIE
+lottie.loadAnimation({
+  container: document.getElementById("background-lottie"),
+  path: "./background2.json",
+  renderer: "canvas",
+  loop: true,
+  autoplay: true
+});
+
+lottie.loadAnimation({
+  container: document.getElementById("lottie-bot"),
+  path: "./Hi_SN_bot.json",
+  renderer: "svg",
+  loop: true,
+  autoplay: true
+});
+
+// 📊 DATA
 let baseDatos = [];
 let timeout = null;
 
-// 🔹 Cargar CSV
 fetch("data.csv")
   .then(res => res.text())
   .then(text => {
-      const filas = text.split("\n").slice(1);
+    const filas = text.split("\\n").slice(1);
 
-      baseDatos = filas.map(f => {
-          const [folio, cpu, monitor, ups] = f.split(",");
-          return { folio, cpu, monitor, ups };
-      });
-
-      document.getElementById("status").innerText = "Base cargada ✔";
+    baseDatos = filas.map(f => {
+      const [folio, cpu, monitor, ups] = f.split(",");
+      return { folio, cpu, monitor, ups };
+    });
   });
 
 // 🔹 Barcode
 function generarBarcode(valor) {
-    return `https://barcodeapi.org/api/code128/${valor}`;
+  return `https://barcodeapi.org/api/code128/${valor}`;
 }
 
-// 🔹 Buscar
+// 🔍 Buscar
 function buscar(folioInput) {
-    const item = baseDatos.find(x => x.folio === folioInput);
+  const item = baseDatos.find(x => x.folio === folioInput);
 
-    if (!item) {
-        document.getElementById("folio").innerText = "No encontrado";
-        document.getElementById("cpu").src = "";
-        document.getElementById("monitor").src = "";
-        document.getElementById("ups").src = "";
-        return;
-    }
+  if (!item) {
+    document.getElementById("resultado").classList.add("oculto");
+    return;
+  }
 
-    document.getElementById("folio").innerText = "Folio: " + item.folio;
-    document.getElementById("cpu").src = generarBarcode(item.cpu);
-    document.getElementById("monitor").src = generarBarcode(item.monitor);
-    document.getElementById("ups").src = generarBarcode(item.ups);
+  document.getElementById("resultado").classList.remove("oculto");
+  document.getElementById("folioLabel").innerText = "Folio: " + item.folio;
+
+  document.getElementById("cpu").src = generarBarcode(item.cpu);
+  document.getElementById("monitor").src = generarBarcode(item.monitor);
+  document.getElementById("ups").src = generarBarcode(item.ups);
 }
 
-// 🔹 Evento en tiempo real (con debounce)
-document.getElementById("inputFolio").addEventListener("input", function(e) {
-    const valor = e.target.value.trim();
+// ⌨️ Tiempo real
+document.getElementById("folioInput").addEventListener("input", function(e) {
+  const valor = e.target.value.trim();
 
-    clearTimeout(timeout);
+  clearTimeout(timeout);
 
-    timeout = setTimeout(() => {
-        if (valor.length > 2) { // evita buscar con 1 letra
-            buscar(valor);
-        }
-    }, 300); // 300ms = más fluido
+  timeout = setTimeout(() => {
+    if (valor.length > 2) {
+      buscar(valor);
+    } else {
+      document.getElementById("resultado").classList.add("oculto");
+    }
+  }, 250);
 });
 </script>
 
