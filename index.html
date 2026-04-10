@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
 <title>Implementaciones - Barcodes</title>
 
@@ -11,107 +11,115 @@
 <style>
 body {
   margin: 0;
-  padding: 0;
-  overflow: hidden;
   font-family: Arial, sans-serif;
+  overflow: hidden;
 }
 
-/* Fondo SIEMPRE completo */
+/* 🔥 FONDO REAL (SIN CAPA BLANCA) */
 #background-lottie {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   z-index: 0;
 }
 
-/* Contenedor principal */
+/* 🌫️ CAPA SUAVE (opcional ligera) */
+.overlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,0.05); /* MUY leve */
+  z-index: 1;
+}
+
+/* 💎 TARJETA */
 .central-container {
   position: relative;
   z-index: 2;
-  width: 50vw;
-  height: 90vh;
+  width: 70vw;
+  height: 65vh;
   margin: auto;
-  margin-top: 3vh;
-  background: rgba(255,255,255,0.8);
-  border-radius: 40px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-  display: flex;
-  flex-direction: column;
-  transition: all 0.5s ease;
-}
+  margin-top: 10vh;
 
-/* 🔥 MODO EXPANDIDO */
-.central-container.expandido {
-  width: 80vw;
+  background: rgba(255,255,255,0.85);
+  border-radius: 40px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+
   display: flex;
-  flex-direction: row;
+  padding: 30px;
+  gap: 20px;
 }
 
 /* IZQUIERDA */
 .left-panel {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  text-align: center;
+}
+
+#lottie-bot {
+  width: 180px;
+  margin: auto;
+}
+
+/* INPUT */
+.search-container input {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  width: 60%;
+}
+
+/* FOLIO ABAJO */
+.folio-final {
+  margin-top: 20px;
+  font-weight: bold;
+  color: #0078d4;
+  font-size: 18px;
 }
 
 /* DERECHA */
 .right-panel {
   flex: 1;
-  display: none;
-  padding: 20px;
-  justify-content: center;
-  align-items: center;
-}
-
-/* Mostrar resultados */
-.central-container.expandido .right-panel {
   display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 25px;
 }
 
-/* Bot */
-#lottie-bot {
-  width: 180px;
+/* ITEM */
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-/* Input */
-.search-container input {
-  margin-top: 15px;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  width: 70%;
+.item span {
+  width: 80px;
+  font-weight: bold;
 }
 
-/* Cards */
-.card {
-  background: white;
-  padding: 10px;
-  margin-bottom: 15px;
-  border-radius: 10px;
-  text-align: center;
+.item img {
+  width: 250px;
 }
 
-.card img {
-  width: 200px;
-}
-
-/* Logos */
+/* LOGOS */
 #logo-mbt {
   position: absolute;
-  top: 10px;
+  top: 20px;
   left: 20px;
   width: 120px;
+  z-index: 3;
 }
 
 #logo-ds {
   position: absolute;
-  bottom: 10px;
+  bottom: 20px;
   right: 20px;
   width: 80px;
+  z-index: 3;
 }
 </style>
 </head>
@@ -119,8 +127,9 @@ body {
 <body>
 
 <div id="background-lottie"></div>
+<div class="overlay"></div>
 
-<div class="central-container" id="mainContainer">
+<div class="central-container">
 
   <!-- IZQUIERDA -->
   <div class="left-panel">
@@ -133,35 +142,32 @@ body {
       <input type="text" id="folioInput" placeholder="Escribe el folio a consultar ...">
     </div>
 
+    <div class="folio-final" id="folioFinal"></div>
+
   </div>
 
   <!-- DERECHA -->
-  <div class="right-panel" id="resultado">
+  <div class="right-panel">
 
-    <div>
-      <div id="folioLabel" style="font-weight:bold;color:#0078d4;margin-bottom:10px;"></div>
+    <div class="item">
+      <span>CPU</span>
+      <img id="cpu">
+    </div>
 
-      <div class="card">
-        <div>CPU</div>
-        <img id="cpu">
-      </div>
+    <div class="item">
+      <span>Monitor</span>
+      <img id="monitor">
+    </div>
 
-      <div class="card">
-        <div>Monitor</div>
-        <img id="monitor">
-      </div>
-
-      <div class="card">
-        <div>UPS</div>
-        <img id="ups">
-      </div>
+    <div class="item">
+      <span>UPS</span>
+      <img id="ups">
     </div>
 
   </div>
 
 </div>
 
-<!-- Logos -->
 <div id="logo-mbt"></div>
 <div id="logo-ds"></div>
 
@@ -199,10 +205,8 @@ lottie.loadAnimation({
   autoplay: true
 });
 
-// 📊 DATA
+// DATA
 let baseDatos = [];
-let timeout = null;
-
 fetch("data.csv")
   .then(res => res.text())
   .then(text => {
@@ -213,37 +217,26 @@ fetch("data.csv")
     });
   });
 
-// 🔹 Barcode
+// Barcode
 function generarBarcode(valor) {
   return `https://barcodeapi.org/api/code128/${valor}`;
 }
 
-// 🔍 Buscar
-function buscar(folioInput) {
-  const item = baseDatos.find(x => x.folio === folioInput);
+// Buscar
+document.getElementById("folioInput").addEventListener("input", function(e) {
+  const valor = e.target.value.trim();
+
+  if (valor.length < 3) return;
+
+  const item = baseDatos.find(x => x.folio === valor);
 
   if (!item) return;
 
-  document.getElementById("mainContainer").classList.add("expandido");
-
-  document.getElementById("folioLabel").innerText = "Folio: " + item.folio;
+  document.getElementById("folioFinal").innerText = item.folio;
 
   document.getElementById("cpu").src = generarBarcode(item.cpu);
   document.getElementById("monitor").src = generarBarcode(item.monitor);
   document.getElementById("ups").src = generarBarcode(item.ups);
-}
-
-// ⌨️ Tiempo real
-document.getElementById("folioInput").addEventListener("input", function(e) {
-  const valor = e.target.value.trim();
-
-  clearTimeout(timeout);
-
-  timeout = setTimeout(() => {
-    if (valor.length > 2) {
-      buscar(valor);
-    }
-  }, 300);
 });
 </script>
 
