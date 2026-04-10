@@ -10,12 +10,20 @@
 * {
   margin: 0;
   margin: 0;
-  padding: 0;
-  overflow: inherit;
-  font-family: Arial, sans-serif;
-  text-align: center;
-  text-size-adjust: 100%;
+        padding: 0;
+        overflow: inherit;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        text-size-adjust: 100%;
 }
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
 .fullscreen-container {
   min-height: 100vh;
   display: flex;
@@ -23,16 +31,14 @@
   justify-content: center;
   position: relative;
 }
-
 #background-lottie {
   position: fixed;
-  background-color: rgba(0, 110, 200, 0.65);
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   z-index: 0;
-
+  opacity: 0.3;
 }
 
 .central-container {
@@ -42,7 +48,7 @@
   transform: translate(-50%, -50%);
   z-index: 2;
   width: 55vw;
-  height: 95vh;
+  height: 85vh;
   background: rgba(255, 255, 255, 0.75);
   border-radius: 45px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
@@ -50,7 +56,7 @@
   flex-direction: column;
   transition: all 0.5s ease;
   backdrop-filter: blur(10px);
-
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .central-container.expandido {
@@ -116,8 +122,8 @@ h2 {
 .search-container input:focus {
   outline: none;
   border-color: #667eea;
-  background: rgba(255, 255, 255, 0.75);
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .card {
@@ -162,6 +168,14 @@ h2 {
 }
 
 #logo-mbt {
+  position: fixed;
+  top: 20px;
+  left: 30px;
+  width: 100px;
+  z-index: 10;
+}
+
+#logo-ds {
   position: fixed;
   bottom: 20px;
   right: 30px;
@@ -247,7 +261,7 @@ lottie.loadAnimation({
 });
 
 lottie.loadAnimation({
-  container: document.getElementById("logo-mbt"),
+  container: document.getElementById("logo-ds"),
   path: "./Logo_DS_wink.json",
   renderer: "svg",
   loop: true,
