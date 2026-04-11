@@ -270,6 +270,7 @@ folioInput.addEventListener("input", e => {
   const valor = e.target.value.trim();
   clearTimeout(timeout);
 
+  // ✅ Estado inicial
   if (!valor) {
     mainContainer.classList.remove("expandido");
     folioLabel.textContent = "";
@@ -277,7 +278,7 @@ folioInput.addEventListener("input", e => {
     return;
   }
 
-  loadBot("./Search_SN_bot.json");
+  // ✅ NO cambiar lottie mientras se escribe
 
   timeout = setTimeout(() => {
     const item = baseDatos.find(x => x.folio === valor);
@@ -290,6 +291,7 @@ folioInput.addEventListener("input", e => {
     monitor.src = barcode(item.monitor);
     ups.src = barcode(item.ups);
 
+    // ✅ Solo aquí cambia el lottie
     loadBot("./Confused_SN_bot.json");
   }, 400);
 });
