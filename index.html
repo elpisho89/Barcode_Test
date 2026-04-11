@@ -187,7 +187,20 @@ html, body {
 
 /* ===== MOBILE ===== */
 @media (max-width: 768px) {
-  
+
+  /* ✅ PERMITIR SCROLL EN MÓVIL */
+  html, body {
+    height: auto;
+    overflow-y: auto;
+  }
+
+  .fullscreen-container {
+    position: relative;
+    min-height: 100vh;
+    height: auto;
+  }
+
+  /* ✅ LOGO RESPONSIVO POR % */
   #logo-mbt {
     width: 22%;
     max-width: 70px;
@@ -196,6 +209,7 @@ html, body {
     top: 16px;
   }
 
+  /* ✅ CONTENEDOR EN PLANO VERTICAL */
   .central-container,
   .central-container.expandido {
     width: 94vw;
@@ -215,11 +229,13 @@ html, body {
     padding: 10px 20px 30px;
   }
 
+  /* ✅ Mostrar SOLO cuando hay resultados */
   .central-container.expandido .right-panel {
     display: flex;
     flex-direction: column;
   }
 
+  /* ✅ TARJETAS VERTICALES */
   .card {
     flex-direction: column;
     align-items: center;
