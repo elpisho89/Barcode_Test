@@ -36,8 +36,8 @@ html, body {
   position: fixed;
   inset: 0;
   z-index: 0;
-  pointer-events: none;
   opacity: 0.5;
+  pointer-events: none;
 }
 
 /* ===== CONTENEDOR CENTRAL ===== */
@@ -81,7 +81,7 @@ html, body {
   border-right: 1px solid rgba(0,0,0,.08);
 }
 
-/* ✅ TÍTULO AJUSTADO */
+/* TÍTULO */
 .left-panel h2 {
   margin-bottom: 22px;
   font-size: 20px;
@@ -118,7 +118,7 @@ html, body {
 #folioLabel {
   margin-top: 16px;
   font-weight: 700;
-  font-size: 15px;
+  font-size: 18px;
   color: #2f6dff;
 }
 
@@ -140,20 +140,19 @@ html, body {
   flex-direction: column;
 }
 
-/* Cards */
+/* ===== CARDS (SIN DEGRADADO) ===== */
 .card {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 10px;
   padding: 10px;
   margin-bottom: 10px;
-  border-radius: 16px;
 }
 
 .card .label {
   min-width: 90px;
   text-align: right;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 16px;
   color: #6b7280;
 }
@@ -163,8 +162,31 @@ html, body {
   background: white;
   padding: 10px;
   border-radius: 8px;
+  cursor: zoom-in;
 }
-  @media (max-width: 768px) {
+
+/* ===== OVERLAY BARCODE ===== */
+#barcode-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+#barcode-overlay img {
+  max-width: 90vw;
+  max-height: 70vh;
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
 
   .central-container,
   .central-container.expandido {
@@ -179,9 +201,15 @@ html, body {
     padding-bottom: 15px;
   }
 
+  /* ✅ NO mostrar tarjetas al inicio */
   .right-panel {
-    display: flex !important;
+    display: none;
     padding: 10px 20px 30px;
+  }
+
+  .central-container.expandido .right-panel {
+    display: flex;
+    flex-direction: column;
   }
 
   .card {
@@ -243,8 +271,13 @@ html, body {
   </div>
 </div>
 
+<!-- Overlay -->
+<div id="barcode-overlay">
+  <img id="barcode-zoom">
+</div>
+
 <script>
-/* ===== BOT LOTTIE ===== */
+/* ===== BOT ===== */
 const botContainer = document.getElementById("lottie-bot");
 let botAnimation = null;
 
@@ -261,7 +294,7 @@ function loadBot(path) {
 
 loadBot("./Hi_SN_bot.json");
 
-/* ===== FONDO LOTTIE (CLAVE) ===== */
+/* ===== BACKGROUND ===== */
 lottie.loadAnimation({
   container: document.getElementById("background-lottie"),
   path: "./background1.json",
@@ -269,7 +302,7 @@ lottie.loadAnimation({
   loop: true,
   autoplay: true,
   rendererSettings: {
-    preserveAspectRatio: "xMidYMid slice", // ✅ CLAVE
+    preserveAspectRatio: "xMidYMid slice",
     clearCanvas: true
   }
 });
@@ -305,7 +338,6 @@ folioInput.addEventListener("input", e => {
   const valor = e.target.value.trim();
   clearTimeout(timeout);
 
-  // ✅ Estado inicial
   if (!valor) {
     mainContainer.classList.remove("expandido");
     folioLabel.textContent = "";
@@ -313,22 +345,35 @@ folioInput.addEventListener("input", e => {
     return;
   }
 
-  // ✅ NO cambiar lottie mientras se escribe
-
   timeout = setTimeout(() => {
     const item = baseDatos.find(x => x.folio === valor);
     if (!item) return;
 
     mainContainer.classList.add("expandido");
-    folioLabel.textContent = "Folio: " + item.folio;
+    folioLabel.textContent = item.folio;
 
     cpu.src = barcode(item.cpu);
     monitor.src = barcode(item.monitor);
     ups.src = barcode(item.ups);
 
-    // ✅ Solo aquí cambia el lottie
     loadBot("./Confused_SN_bot.json");
   }, 400);
+});
+
+/* ===== ZOOM BARCODE ===== */
+const overlay = document.getElementById("barcode-overlay");
+const zoomImg = document.getElementById("barcode-zoom");
+
+document.addEventListener("click", e => {
+  if (e.target.tagName === "IMG" && e.target.closest(".card")) {
+    zoomImg.src = e.target.src;
+    overlay.style.display = "flex";
+  }
+});
+
+overlay.addEventListener("click", () => {
+  overlay.style.display = "none";
+  zoomImg.src = "";
 });
 </script>
 
