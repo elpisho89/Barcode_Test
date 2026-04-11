@@ -8,47 +8,36 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
 
 <style>
-/* ✅ CLAVE: eliminar cualquier “respiro” del viewport */
+/* ===== RESET Y VIEWPORT ===== */
 html, body {
   width: 100%;
   height: 100%;
+  margin: 0;
   overflow: hidden;
 }
 
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
+  font-family: "Segoe UI", Arial, sans-serif;
 }
 
-/* ===== FULLSCREEN (AJUSTADO) ===== */
+/* ===== FULLSCREEN ===== */
 .fullscreen-container {
-  position: fixed;           /* ✅ fijo, no relativo */
-  inset: 0;                  /* ✅ ocupa todo */
+  position: fixed;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #667eea, #764ba2);
 }
 
-/* ===== FONDO LOTTIE (CORRECTO) ===== */
+/* ===== FONDO LOTTIE ===== */
 #background-lottie {
   position: fixed;
   inset: 0;
   z-index: 0;
-  opacity: .5;
   pointer-events: none;
-}
-
-/* ✅ CLAVE ABSOLUTA: forzar el canvas/svg interno */
-#background-lottie > canvas,
-#background-lottie > svg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw !important;
-  height: 100vh !important;
+  opacity: 0.5;
 }
 
 /* ===== CONTENEDOR CENTRAL ===== */
@@ -57,28 +46,28 @@ html, body {
   z-index: 2;
   width: 55vw;
   height: 85vh;
-  background: rgba(255,255,255,.75);
+  background: rgba(236,236,250,.9);
   border-radius: 45px;
-  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  box-shadow: 0 25px 70px rgba(0,0,0,.35);
   display: flex;
-  transition: .5s;
-  backdrop-filter: blur(10px);
+  transition: .5s ease;
+  backdrop-filter: blur(12px);
 }
 
 .central-container.expandido {
   width: 85vw;
 }
 
-/* Logo Mainbit */
+/* ===== LOGO MAINBIT ===== */
 #logo-mbt {
   position: absolute;
   top: 20px;
-  left: 25px;
+  left: 28px;
   width: 110px;
   z-index: 5;
 }
 
-/* ===== IZQUIERDA ===== */
+/* ===== PANEL IZQUIERDO ===== */
 .left-panel {
   flex: 1;
   padding: 40px 30px;
@@ -86,23 +75,28 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-right: none;
 }
 
 .central-container.expandido .left-panel {
-  border-right: 1px solid #e0e0e0;
+  border-right: 1px solid rgba(0,0,0,.08);
 }
 
+/* ✅ TÍTULO AJUSTADO */
 .left-panel h2 {
-  margin-bottom: 20px;
+  margin-bottom: 22px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #44516b;
+  letter-spacing: .4px;
 }
 
+/* Bot */
 #lottie-bot {
   width: 200px;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
-/* ✅ INPUT AJUSTADO */
+/* Input */
 .search-container input {
   width: 95%;
   padding: 10px 14px;
@@ -115,14 +109,20 @@ html, body {
   font-size: 12px;
 }
 
-#folioLabel {
-  margin-top: 15px;
-  font-weight: 700;
-  color: #1e78ff;
-  font-size: 16px;
+.search-container input:focus {
+  outline: none;
+  border-color: #5f6cff;
 }
 
-/* ===== DERECHA ===== */
+/* Folio */
+#folioLabel {
+  margin-top: 16px;
+  font-weight: 700;
+  font-size: 15px;
+  color: #2f6dff;
+}
+
+/* ===== PANEL DERECHO ===== */
 .right-panel {
   flex: 1;
   display: none;
@@ -155,7 +155,8 @@ html, body {
   min-width: 90px;
   text-align: right;
   font-weight: 600;
-  color: #667eea;
+  font-size: 13px;
+  color: #5c78d8;
 }
 
 .card img {
@@ -176,6 +177,7 @@ html, body {
 
     <div id="logo-mbt"></div>
 
+    <!-- IZQUIERDA -->
     <div class="left-panel">
       <h2>Implementaciones Mainbit</h2>
       <div id="lottie-bot"></div>
@@ -187,6 +189,7 @@ html, body {
       <div id="folioLabel"></div>
     </div>
 
+    <!-- DERECHA -->
     <div class="right-panel">
       <div class="card">
         <span class="label">CPU</span>
@@ -206,7 +209,7 @@ html, body {
 </div>
 
 <script>
-/* ===== LOTTIES ===== */
+/* ===== BOT LOTTIE ===== */
 const botContainer = document.getElementById("lottie-bot");
 let botAnimation = null;
 
@@ -223,14 +226,20 @@ function loadBot(path) {
 
 loadBot("./Hi_SN_bot.json");
 
+/* ===== FONDO LOTTIE (CLAVE) ===== */
 lottie.loadAnimation({
   container: document.getElementById("background-lottie"),
   path: "./background1.json",
   renderer: "canvas",
   loop: true,
-  autoplay: true
+  autoplay: true,
+  rendererSettings: {
+    preserveAspectRatio: "xMidYMid slice", // ✅ CLAVE
+    clearCanvas: true
+  }
 });
 
+/* Logo */
 lottie.loadAnimation({
   container: document.getElementById("logo-mbt"),
   path: "./Logo_Mbt_wink.json",
@@ -251,7 +260,7 @@ fetch("data.csv")
     });
   });
 
-function barcode(v){
+function barcode(v) {
   return `https://barcodeapi.org/api/code128/${v}`;
 }
 
