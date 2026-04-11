@@ -11,64 +11,58 @@
 * {
   margin: 0;
   padding: 0;
-  font-family: Arial, sans-serif;
   box-sizing: border-box;
+  font-family: Arial, sans-serif;
 }
 
-body {
-  overflow: hidden;
-}
+body { overflow: hidden; }
 
-/* ===== CONTENEDOR FULLSCREEN ===== */
+/* ===== FULLSCREEN ===== */
 .fullscreen-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #667eea, #764ba2);
 }
 
-/* Fondo Lottie */
 #background-lottie {
   position: fixed;
   inset: 0;
   z-index: 0;
-  opacity: 0.35;
+  opacity: .35;
   pointer-events: none;
 }
 
-/* Logo Mainbit (rojo) */
-#logo-mbt {
-  position: fixed;
-  top: 20px;
-  left: 25px;
-  width: 110px;
-  z-index: 10;
-}
-
-/* ===== TARJETA CENTRAL ===== */
+/* ===== CONTENEDOR CENTRAL ===== */
 .central-container {
   position: relative;
   z-index: 2;
   width: 55vw;
   height: 85vh;
-  background: rgba(255,255,255,0.75);
+  background: rgba(255,255,255,.75);
   border-radius: 45px;
   box-shadow: 0 20px 60px rgba(0,0,0,.5);
   display: flex;
-  flex-direction: column;
-  transition: all .5s ease;
+  transition: .5s;
   backdrop-filter: blur(10px);
 }
 
-/* Expandido */
 .central-container.expandido {
   width: 85vw;
-  flex-direction: row;
 }
 
-/* Panel izquierdo */
+/* Logo Mainbit (zona azul) */
+#logo-mbt {
+  position: absolute;
+  top: 20px;
+  left: 25px;
+  width: 110px;
+  z-index: 5;
+}
+
+/* ===== IZQUIERDA ===== */
 .left-panel {
   flex: 1;
   padding: 40px 30px;
@@ -76,41 +70,44 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-right: 1px solid #eaeaea;
+  border-right: 1px solid #e0e0e0;
 }
 
 .left-panel h2 {
-  margin-bottom: 25px;
-  font-size: 26px;
-  font-weight: 600;
+  margin-bottom: 20px;
 }
 
-/* Bot */
 #lottie-bot {
   width: 200px;
   margin-bottom: 20px;
 }
 
-/* Input */
 .search-container input {
   width: 85%;
-  padding: 14px 18px;
+  padding: 14px;
   border-radius: 12px;
   border: 2px solid #ddd;
   font-size: 16px;
 }
 
-.search-container input:focus {
-  outline: none;
-  border-color: #667eea;
+#folioLabel {
+  margin-top: 15px;
+  font-weight: 700;
+  color: #1e78ff;
+  font-size: 16px;
 }
 
-/* ===== PANEL DERECHO ===== */
+/* ===== DERECHA ===== */
 .right-panel {
   flex: 1;
   display: none;
   padding: 40px 30px;
   overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.right-panel::-webkit-scrollbar {
+  display: none;
 }
 
 .central-container.expandido .right-panel {
@@ -118,64 +115,29 @@ body {
   flex-direction: column;
 }
 
-#folioLabel {
-  text-align: center;
-  font-weight: 700;
-  color: #667eea;
-  margin-bottom: 24px;
-}
-
-/* ===== CARDS (ETIQUETA AL LADO) ===== */
+/* Cards */
 .card {
   display: flex;
   align-items: center;
   gap: 20px;
-  padding: 18px 20px;
+  padding: 18px;
   margin-bottom: 20px;
   border-radius: 16px;
   background: linear-gradient(135deg,#f5f7fa,#c3cfe2);
-  box-shadow: 0 5px 15px rgba(0,0,0,.08);
 }
 
-/* etiqueta lateral */
 .card .label {
   min-width: 90px;
   text-align: right;
   font-weight: 600;
   color: #667eea;
-  text-transform: uppercase;
-  font-size: 14px;
 }
 
-/* código grande */
 .card img {
   width: 280px;
-  background: #fff;
+  background: white;
   padding: 10px;
   border-radius: 8px;
-}
-
-/* Responsive */
-@media (max-width:768px) {
-  .central-container,
-  .central-container.expandido {
-    width: 90vw;
-    height: 85vh;
-    flex-direction: column;
-  }
-
-  .left-panel {
-    border-right: none;
-    border-bottom: 1px solid #eaeaea;
-  }
-
-  .card {
-    flex-direction: column;
-  }
-
-  .card .label {
-    text-align: center;
-  }
 }
 </style>
 </head>
@@ -183,58 +145,64 @@ body {
 <body>
 
 <div class="fullscreen-container">
-
   <div id="background-lottie"></div>
-  <div id="logo-mbt"></div>
 
   <div class="central-container" id="mainContainer">
 
-    <!-- IZQUIERDA -->
+    <div id="logo-mbt"></div>
+
     <div class="left-panel">
       <h2>Implementaciones Mainbit</h2>
       <div id="lottie-bot"></div>
+
       <div class="search-container">
-        <input id="folioInput" placeholder="Escribe el folio a consultar ...">
+        <input id="folioInput" placeholder="Escribe el folio a consultar..." />
       </div>
+
+      <!-- ✅ FOLIO MOVIDO AQUÍ (VERDE) -->
+      <div id="folioLabel"></div>
     </div>
 
-    <!-- DERECHA -->
     <div class="right-panel">
-      <div id="folioLabel"></div>
-
       <div class="card">
         <span class="label">CPU</span>
         <img id="cpu">
       </div>
-
       <div class="card">
         <span class="label">Monitor</span>
         <img id="monitor">
       </div>
-
       <div class="card">
         <span class="label">UPS</span>
         <img id="ups">
       </div>
-
     </div>
+
   </div>
 </div>
 
 <script>
-/* LOTTIES */
-lottie.loadAnimation({
-  container: document.getElementById("background-lottie"),
-  path: "./background2.json",
-  renderer: "canvas",
-  loop: true,
-  autoplay: true
-});
+/* ===== LOTTIES ===== */
+const botContainer = document.getElementById("lottie-bot");
+let botAnimation = null;
+
+function loadBot(path) {
+  if (botAnimation) botAnimation.destroy();
+  botAnimation = lottie.loadAnimation({
+    container: botContainer,
+    path,
+    renderer: "svg",
+    loop: true,
+    autoplay: true
+  });
+}
+
+loadBot("./Hi_SN_bot.json");
 
 lottie.loadAnimation({
-  container: document.getElementById("lottie-bot"),
-  path: "./Hi_SN_bot.json",
-  renderer: "svg",
+  container: background = document.getElementById("background-lottie"),
+  path: "./background1.json",
+  renderer: "canvas",
   loop: true,
   autoplay: true
 });
@@ -247,9 +215,8 @@ lottie.loadAnimation({
   autoplay: true
 });
 
-/* DATA */
+/* ===== DATA ===== */
 let baseDatos = [];
-let timeout = null;
 
 fetch("data.csv")
   .then(r => r.text())
@@ -264,24 +231,34 @@ function barcode(v){
   return `https://barcodeapi.org/api/code128/${v}`;
 }
 
-function buscar(f){
-  const x = baseDatos.find(i => i.folio === f);
-  if(!x) return;
+let timeout = null;
 
-  document.getElementById("mainContainer").classList.add("expandido");
-  document.getElementById("folioLabel").innerText = "Folio: " + x.folio;
-
-  cpu.src = barcode(x.cpu);
-  monitor.src = barcode(x.monitor);
-  ups.src = barcode(x.ups);
-}
-
-folioInput.addEventListener("input",e=>{
+folioInput.addEventListener("input", e => {
+  const valor = e.target.value.trim();
   clearTimeout(timeout);
-  const v = e.target.value.trim();
-  timeout = setTimeout(()=>{
-    if(v.length>2) buscar(v);
-  },300);
+
+  if (!valor) {
+    mainContainer.classList.remove("expandido");
+    folioLabel.textContent = "";
+    loadBot("./Hi_SN_bot.json");
+    return;
+  }
+
+  loadBot("./Search_SN_bot.json");
+
+  timeout = setTimeout(() => {
+    const item = baseDatos.find(x => x.folio === valor);
+    if (!item) return;
+
+    mainContainer.classList.add("expandido");
+    folioLabel.textContent = "Folio: " + item.folio;
+
+    cpu.src = barcode(item.cpu);
+    monitor.src = barcode(item.monitor);
+    ups.src = barcode(item.ups);
+
+    loadBot("./Confused_SN_bot.json");
+  }, 400);
 });
 </script>
 
