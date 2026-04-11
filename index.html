@@ -8,6 +8,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
 
 <style>
+/* ✅ CLAVE: eliminar cualquier “respiro” del viewport */
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -15,27 +22,33 @@
   font-family: Arial, sans-serif;
 }
 
-body { overflow: hidden; }
-
-/* ===== FULLSCREEN ===== */
+/* ===== FULLSCREEN (AJUSTADO) ===== */
 .fullscreen-container {
-  min-height: 100vh;
+  position: fixed;           /* ✅ fijo, no relativo */
+  inset: 0;                  /* ✅ ocupa todo */
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
   background: linear-gradient(135deg, #667eea, #764ba2);
 }
 
+/* ===== FONDO LOTTIE (CORRECTO) ===== */
 #background-lottie {
   position: fixed;
-  width: 100vw !important;
-  height: 100vh !important;
-  object-fit: cover;
   inset: 0;
   z-index: 0;
   opacity: .5;
   pointer-events: none;
+}
+
+/* ✅ CLAVE ABSOLUTA: forzar el canvas/svg interno */
+#background-lottie > canvas,
+#background-lottie > svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw !important;
+  height: 100vh !important;
 }
 
 /* ===== CONTENEDOR CENTRAL ===== */
@@ -56,7 +69,7 @@ body { overflow: hidden; }
   width: 85vw;
 }
 
-/* Logo Mainbit (zona azul) */
+/* Logo Mainbit */
 #logo-mbt {
   position: absolute;
   top: 20px;
@@ -69,12 +82,15 @@ body { overflow: hidden; }
 .left-panel {
   flex: 1;
   padding: 40px 30px;
-  border-right: 1px solid #e0e0e0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   border-right: none;
+}
+
+.central-container.expandido .left-panel {
+  border-right: 1px solid #e0e0e0;
 }
 
 .left-panel h2 {
@@ -86,11 +102,16 @@ body { overflow: hidden; }
   margin-bottom: 20px;
 }
 
+/* ✅ INPUT AJUSTADO */
 .search-container input {
   width: 95%;
-  padding: 10px;
+  padding: 10px 14px;
   border-radius: 25px;
   border: 2px solid rgba(57,16,123,.75);
+  font-size: 14px;
+}
+
+.search-container input::placeholder {
   font-size: 12px;
 }
 
@@ -163,7 +184,6 @@ body { overflow: hidden; }
         <input id="folioInput" placeholder="Escribe el folio a consultar..." />
       </div>
 
-      <!-- ✅ FOLIO MOVIDO AQUÍ (VERDE) -->
       <div id="folioLabel"></div>
     </div>
 
@@ -204,7 +224,7 @@ function loadBot(path) {
 loadBot("./Hi_SN_bot.json");
 
 lottie.loadAnimation({
-  container: background = document.getElementById("background-lottie"),
+  container: document.getElementById("background-lottie"),
   path: "./background1.json",
   renderer: "canvas",
   loop: true,
